@@ -20,7 +20,7 @@ public class CityDTO {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "CountryCode", nullable = false)
-    private com.sparta.springtasticsix.springproject.model.entities.CountryDTO countryCode;
+    private CountryDTO countryCode;
 
     @Size(max = 20)
     @NotNull
@@ -47,11 +47,11 @@ public class CityDTO {
         this.name = name;
     }
 
-    public com.sparta.springtasticsix.springproject.model.entities.CountryDTO getCountryCode() {
+    public CountryDTO getCountryCode() {
         return countryCode;
     }
 
-    public void setCountryCode(com.sparta.springtasticsix.springproject.model.entities.CountryDTO countryCode) {
+    public void setCountryCode(CountryDTO countryCode) {
         this.countryCode = countryCode;
     }
 

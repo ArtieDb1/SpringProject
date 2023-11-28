@@ -9,12 +9,12 @@ import java.math.BigDecimal;
 @Table(name = "countrylanguage")
 public class CountrylanguageDTO {
     @EmbeddedId
-    private CountrylanguageDTOId id;
+    private CountrylanguageIdDTO id;
 
     @MapsId("countryCode")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "CountryCode", nullable = false)
-    private com.sparta.springtasticsix.springproject.model.entities.CountryDTO countryCode;
+    private CountryDTO countryCode;
 
     @NotNull
     @Lob
@@ -25,19 +25,19 @@ public class CountrylanguageDTO {
     @Column(name = "Percentage", nullable = false, precision = 4, scale = 1)
     private BigDecimal percentage;
 
-    public CountrylanguageDTOId getId() {
+    public CountrylanguageIdDTO getId() {
         return id;
     }
 
-    public void setId(CountrylanguageDTOId id) {
+    public void setId(CountrylanguageIdDTO id) {
         this.id = id;
     }
 
-    public com.sparta.springtasticsix.springproject.model.entities.CountryDTO getCountryCode() {
+    public CountryDTO getCountryCode() {
         return countryCode;
     }
 
-    public void setCountryCode(com.sparta.springtasticsix.springproject.model.entities.CountryDTO countryCode) {
+    public void setCountryCode(CountryDTO countryCode) {
         this.countryCode = countryCode;
     }
 
