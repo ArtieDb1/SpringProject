@@ -1,5 +1,5 @@
 # SpringProject
-You have been asked to create a Spring program to interact with the MySQL World Database
+You have been asked to create a Spring program to interact with the MySQL World Database.
 This Database is made up of 3 tables which represent:
 
 - country: Information about countries of the world.
