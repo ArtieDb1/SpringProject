@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "country")
+@Table(name = "Country")
 public class CountryDTO {
     @Id
     @Size(max = 3)
