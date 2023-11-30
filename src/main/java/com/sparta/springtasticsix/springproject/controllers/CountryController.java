@@ -1,20 +1,25 @@
 package com.sparta.springtasticsix.springproject.controllers;
 
+import com.sparta.springtasticsix.springproject.model.entities.CityDTO;
 import com.sparta.springtasticsix.springproject.model.entities.CountryDTO;
+import com.sparta.springtasticsix.springproject.model.repositories.CityRepository;
 import com.sparta.springtasticsix.springproject.model.repositories.CountryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
 public class CountryController {
 
     private final CountryRepository countryRepository;
+    private final CityRepository cityRepository;
 
     @Autowired
-    public CountryController(CountryRepository countryRepository) {
+    public CountryController(CountryRepository countryRepository, CityRepository cityRepository) {
         this.countryRepository = countryRepository;
+        this.cityRepository = cityRepository;
     }
 
     @PostMapping("/country/createCountry")
@@ -65,6 +70,31 @@ public class CountryController {
             return "Deleted: " + checkCountry.get().toString();
         } else {
             return "Country not found";
+        }
+    }
+
+    @GetMapping("/country/getCountriesWithNoHos")
+    public List<CountryDTO> getCountriesWithNoHos() {
+        List<CountryDTO> countries = countryRepository.findCountriesWithNullOrBlankHeadOfState();
+        return countries;
+    }
+
+    @GetMapping("/country/getPercentageOfPopulation/{code}")
+    public Double getPercentageOfPopulation(@PathVariable String code) {
+        Optional<CountryDTO> country = countryRepository.findById(code);
+        if(country.isPresent()) {
+            List<CityDTO> cities = cityRepository.findCityDTOByCountryCode(country.get());
+            Integer largestPOP = cities.get(0).getPopulation();
+            for(CityDTO city: cities) {
+                if(city.getPopulation() > largestPOP) {
+                    largestPOP = city.getPopulation();
+                }
+            }
+            Integer countryPOP = country.get().getPopulation();
+            return ((double) largestPOP / countryPOP) * 100;
+        } else {
+            //Need to handle errors here for no country found
+            return 999d;
         }
     }
 }
