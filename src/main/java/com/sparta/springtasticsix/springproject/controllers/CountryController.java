@@ -10,13 +10,6 @@ import java.util.Optional;
 @RestController
 public class CountryController {
 
-//    private final AuthorRepository authorRepository;
-//
-//    @Autowired
-//    public AuthorController(AuthorRepository authorRepository) {
-//        this.authorRepository = authorRepository;
-//    }
-
     private final CountryRepository countryRepository;
 
     @Autowired
