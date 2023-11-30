@@ -5,6 +5,8 @@ import com.sparta.springtasticsix.springproject.model.repositories.CountryReposi
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -25,9 +27,10 @@ public class CountryController {
     }
 
     @PostMapping("/country/createCountry")
-    public CountryDTO createCountry(@RequestBody CountryDTO newCountry) {
+    public Optional<CountryDTO> createCountry(@RequestBody CountryDTO newCountry) {
         countryRepository.save(newCountry);
-        return newCountry;
+        Optional<CountryDTO> newCountryOptional = Optional.of(newCountry);
+        return newCountryOptional;
     }
 
     @GetMapping("/country/getByCode")
@@ -41,7 +44,7 @@ public class CountryController {
     }
 
     @PatchMapping("/country/updateCountry/{code}")
-    public CountryDTO updateCountry(@PathVariable String code, @RequestBody CountryDTO updateCountry) {
+    public Optional<CountryDTO> updateCountry(@PathVariable String code, @RequestBody CountryDTO updateCountry) {
         CountryDTO country = null;
         if(countryRepository.findById(code).isPresent()) {
             country = countryRepository.findById(code).get();
@@ -61,7 +64,8 @@ public class CountryController {
             country.setCapital((updateCountry.getCapital()));
             country.setCode2((updateCountry.getCode2()));
         }
-        return countryRepository.save(country);
+        countryRepository.save(country);
+        return Optional.of(country);
     }
 
     @DeleteMapping("/country/deleteCountry/{code}")

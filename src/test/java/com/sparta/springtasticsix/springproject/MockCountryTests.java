@@ -14,9 +14,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultHandler;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -33,9 +36,6 @@ public class MockCountryTests {
     @MockBean
     private CountryRepository countryRepository;
 
-    @MockBean
-    private CountryController countryController;
-
     @Autowired
     private ObjectMapper objectMapper;
     @Test
@@ -45,26 +45,44 @@ public class MockCountryTests {
         mockCountry.setCode("XYZ");
         Mockito.when(countryRepository.save(mockCountry)).thenReturn(mockCountry);
 
-
         mockMvc
                 .perform(post("http://localhost:8080/country/createCountry")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(mockCountry)))
                 .andExpect(status().is(200))
-                .andDo(print())
-                .andReturn();
-
-
+                .andExpect(content().contentType("application/json"))
+                .andDo(print());
     }
 
+    @Test
+    @DisplayName("Check update country given AGO with new name returns Agola")
+    void checkUpdateCountryGivenAGOWithNewNameReturnsAgola() throws Exception {
+        CountryDTO mockCountry = new CountryDTO();
+        mockCountry.setCode("AGO");
+        mockCountry.setName("Agola");
+        mockCountry.setContinent("Africa");
+        mockCountry.setRegion("Central Africa");
+        mockCountry.setSurfaceArea(BigDecimal.valueOf(1246700));
+        mockCountry.setIndepYear((short) 1975);
+        mockCountry.setPopulation(12878000);
+        mockCountry.setLifeExpectancy(BigDecimal.valueOf(38.3));
+        mockCountry.setGnp(BigDecimal.valueOf(6648.00));
+        mockCountry.setGNPOld(BigDecimal.valueOf(7984.00));
+        mockCountry.setLocalName("Angola");
+        mockCountry.setGovernmentForm("Republic");
+        mockCountry.setHeadOfState("José Eduardo dos Santos");
+        mockCountry.setCapital(56);
+        mockCountry.setCode2("AO");
 
-//        CountryDTO mockCountry = new CountryDTO();
-//        mockCountry.setCode("XYZ");
-//        Mockito.when(countryRepository.save(mockCountry)).thenReturn(mockCountry);
-//        mockMvc
-//                .perform(post("http://localhost:3000/country/createCountry"))
-//                .andExpect(content().contentType("application/json"))
-//                .andExpect(status().is(200))
-//                .andDo(print());
-//    }
+        Mockito.when(countryRepository.findById(mockCountry.getCode())).thenReturn(Optional.of(mockCountry));
+
+        mockMvc
+                .perform(patch("http://localhost:8080//country/updateCountry/AGO")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(mockCountry)))
+                .andExpect(status().is(200))
+                .andExpect(content().contentType("application/json"))
+                .andDo(print());
+    }
+
 }
