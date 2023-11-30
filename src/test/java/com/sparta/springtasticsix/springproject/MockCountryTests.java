@@ -8,10 +8,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CountryController.class)
+@AutoConfigureMockMvc
 public class MockCountryTests {
 
     @Autowired
@@ -38,17 +41,23 @@ public class MockCountryTests {
     @Test
     @DisplayName("Check create country returns given country")
     void checkCreateCountryReturnsGivenCountry() throws Exception {
-        Mockito.when(countryRepository.save(any())).thenReturn(new CountryDTO());
         CountryDTO mockCountry = new CountryDTO();
         mockCountry.setCode("XYZ");
+        Mockito.when(countryRepository.save(mockCountry)).thenReturn(mockCountry);
+
+
         mockMvc
-                .perform(post("http://localhost:3000/country/createCountry")
+                .perform(post("http://localhost:8080/country/createCountry")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(mockCountry)))
                 .andExpect(status().is(200))
-                .andDo(print());
+                .andDo(print())
+                .andReturn();
+
 
     }
+
+
 //        CountryDTO mockCountry = new CountryDTO();
 //        mockCountry.setCode("XYZ");
 //        Mockito.when(countryRepository.save(mockCountry)).thenReturn(mockCountry);
