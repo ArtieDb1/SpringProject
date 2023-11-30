@@ -36,6 +36,4 @@ public class CountryRestTests {
                 .expectBody(CountryDTO.class)
                 .value(country -> assertEquals("Angola", country.getName()));
     }
-
-    
 }
