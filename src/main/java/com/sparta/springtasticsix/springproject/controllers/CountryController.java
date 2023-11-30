@@ -5,6 +5,7 @@ import com.sparta.springtasticsix.springproject.model.repositories.CountryReposi
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -66,5 +67,11 @@ public class CountryController {
         } else {
             return "Country not found";
         }
+    }
+
+    @GetMapping("/country/getCountriesWithNoHos")
+    public List<CountryDTO> getCountriesWithNoHos() {
+        List<CountryDTO> countries = countryRepository.findCountriesWithNullOrBlankHeadOfState();
+        return countries;
     }
 }
