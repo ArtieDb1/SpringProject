@@ -2,6 +2,7 @@ package com.sparta.springtasticsix.springproject.controllers;
 
 
 import com.sparta.springtasticsix.springproject.model.entities.CityDTO;
+import com.sparta.springtasticsix.springproject.model.entities.CountryDTO;
 import com.sparta.springtasticsix.springproject.model.repositories.CityRepository;
 import com.sparta.springtasticsix.springproject.model.repositories.CountryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
