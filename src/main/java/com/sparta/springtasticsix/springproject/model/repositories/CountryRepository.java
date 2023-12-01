@@ -18,5 +18,6 @@ public interface CountryRepository extends JpaRepository<CountryDTO, String> {
 
 //    @Query("SELECT c.name, COUNT(ci.name) FROM CountryDTO c LEFT JOIN CityDTO ci ON c.code = ci.countryCode GROUP BY c.code ORDER BY COUNT(ci.name) DESC LIMIT 1")
 //    Object findCountryWithMostCitiesNative();
+    Integer findPopulationOfCountryByCode(String code);
 
 }

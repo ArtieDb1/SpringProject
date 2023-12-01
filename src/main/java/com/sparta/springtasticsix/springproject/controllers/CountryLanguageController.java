@@ -3,25 +3,29 @@ package com.sparta.springtasticsix.springproject.controllers;
 import com.sparta.springtasticsix.springproject.exceptions.duplicatelanguageprotocol.DuplicateLanguageException;
 import com.sparta.springtasticsix.springproject.exceptions.languagenotfoundprotocol.LanguageNotFoundException;
 import com.sparta.springtasticsix.springproject.model.entities.CountryDTO;
-import com.sparta.springtasticsix.springproject.model.entities.CountrylanguageDTO;
-import com.sparta.springtasticsix.springproject.model.entities.CountrylanguageIdDTO;
-import com.sparta.springtasticsix.springproject.model.repositories.CountrylanguageRepository;
+import com.sparta.springtasticsix.springproject.model.entities.CountryLanguageDTO;
+import com.sparta.springtasticsix.springproject.model.entities.CountryLanguageIdDTO;
+import com.sparta.springtasticsix.springproject.model.repositories.CountryRepository;
+import com.sparta.springtasticsix.springproject.model.repositories.CountryLanguageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
+import java.util.*;
 
 @RestController
 public class CountryLanguageController {
 
-    private final CountrylanguageRepository countryLanguageRepository;
+    private final CountryLanguageRepository countryLanguageRepository;
+    private final CountryRepository countryRepository;
 
 
     @Autowired
-    public CountryLanguageController(CountrylanguageRepository countryLanguageRepository) {
+    public CountryLanguageController(CountryLanguageRepository countryLanguageRepository, CountryRepository countryRepository) {
         this.countryLanguageRepository = countryLanguageRepository;
+        this.countryRepository = countryRepository;
     }
 
     @PostMapping("/language/createLanguage")
@@ -29,7 +33,6 @@ public class CountryLanguageController {
         if (countryLanguageRepository.existsById(newLanguage.getId())){
             throw new DuplicateLanguageException(newLanguage);
         }
-
         countryLanguageRepository.save(newLanguage);
         return newLanguage;
     }
@@ -40,7 +43,7 @@ public class CountryLanguageController {
         id.setCountryCode(code);
         id.setLanguage(language);
 
-        Optional<CountrylanguageDTO> checkCountryLanguage = countryLanguageRepository.findById(id);
+        Optional<CountryLanguageDTO> checkCountryLanguage = countryLanguageRepository.findById(id);
 
         if (checkCountryLanguage.isPresent()) {
             countryLanguageRepository.delete(checkCountryLanguage.get());
@@ -61,8 +64,8 @@ public class CountryLanguageController {
         id.setCountryCode(code);
         id.setLanguage(language);
 
-        Optional<CountrylanguageDTO> checkCountryLanguage = countryLanguageRepository.findById(id);
-        CountrylanguageDTO newlanguage = null;
+        Optional<CountryLanguageDTO> checkCountryLanguage = countryLanguageRepository.findById(id);
+        CountryLanguageDTO newlanguage = null;
 
         if (checkCountryLanguage.isPresent()) {
             return countryLanguageRepository.findById(id)
@@ -98,10 +101,10 @@ public class CountryLanguageController {
         id.setCountryCode(code);
         id.setLanguage(language);
 
-        Optional<CountrylanguageDTO> checkCountryLanguage = countryLanguageRepository.findById(id);
+        Optional<CountryLanguageDTO> checkCountryLanguage = countryLanguageRepository.findById(id);
 
         if (checkCountryLanguage.isPresent()) {
-            CountrylanguageDTO countryLanguage = checkCountryLanguage.get();
+            CountryLanguageDTO countryLanguage = checkCountryLanguage.get();
 
             return checkCountryLanguage;
         } else {
@@ -109,5 +112,38 @@ public class CountryLanguageController {
             throw new LanguageNotFoundException(language);
 
         }
+    }
+
+    //get official language of country - if official is true
+    //if more than one official language, then keep the highest
+    //get the percentage of population that use this language
+    //get the total population of that country
+    //multiply the percentage for the total population
+    @GetMapping("/language/getPopulation")
+    public HashMap<String, Integer> getPopulationOfOfficialLanguage(@RequestParam(name = "code", required = true)String code) {
+        //exception in case there's no official language
+        HashMap<String,Integer> result = new HashMap<>();
+        Optional<CountryDTO> optionalCountry = countryRepository.findById(code);
+        if(optionalCountry.isPresent()) {
+            List<CountryLanguageDTO> officialLanguages = countryLanguageRepository.findOfficialLanguageByCountryCode(optionalCountry.get());
+            String selectedLanguage = "";
+            double population = 0d;
+            BigDecimal largestPercentage = BigDecimal.valueOf(0);
+            for(CountryLanguageDTO language : officialLanguages) {
+                if(language.getIsOfficial().equals("T")) {
+                    String newLanguage = language.getId().getLanguage();
+                    BigDecimal percentageOfOfficialLanguage = language.getPercentage();
+                    if(percentageOfOfficialLanguage.doubleValue() > largestPercentage.doubleValue()) {
+                        largestPercentage = percentageOfOfficialLanguage;
+                        population = optionalCountry.get().getPopulation() * (largestPercentage.doubleValue() / 100);
+                        selectedLanguage = newLanguage;
+                    }
+                } else {
+                    selectedLanguage = "This country has no official language";
+                }
+            }
+            result.put(selectedLanguage, (int) population);
+        }
+        return result;
     }
 }
