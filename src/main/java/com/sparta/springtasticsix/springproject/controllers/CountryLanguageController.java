@@ -1,5 +1,7 @@
 package com.sparta.springtasticsix.springproject.controllers;
 
+import com.sparta.springtasticsix.springproject.exceptions.duplicatelanguageprotocol.DuplicateLanguageException;
+import com.sparta.springtasticsix.springproject.exceptions.languagenotfoundprotocol.LanguageNotFoundException;
 import com.sparta.springtasticsix.springproject.model.entities.CountryDTO;
 import com.sparta.springtasticsix.springproject.model.entities.CountryLanguageDTO;
 import com.sparta.springtasticsix.springproject.model.entities.CountryLanguageIdDTO;
@@ -9,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.Map;
+import java.util.Optional;
 import java.util.*;
 
 @RestController
@@ -25,14 +29,17 @@ public class CountryLanguageController {
     }
 
     @PostMapping("/language/createLanguage")
-    public CountryLanguageDTO createLanguage(@RequestBody CountryLanguageDTO newLanguage) {
+    public CountrylanguageDTO createLanguage(@RequestBody CountrylanguageDTO newLanguage) throws DuplicateLanguageException {
+        if (countryLanguageRepository.existsById(newLanguage.getId())){
+            throw new DuplicateLanguageException(newLanguage);
+        }
         countryLanguageRepository.save(newLanguage);
         return newLanguage;
     }
 
     @DeleteMapping("/language/deleteLanguage")
-    public String deleteLanguage(@RequestParam(name = "code", required = true) String code, @RequestParam(name = "language", required = true) String language) {
-        CountryLanguageIdDTO id = new CountryLanguageIdDTO();
+    public String deleteLanguage (@RequestParam(name = "code", required = true) String code, @RequestParam(name = "language", required = true) String language) throws LanguageNotFoundException {
+        CountrylanguageIdDTO id = new CountrylanguageIdDTO();
         id.setCountryCode(code);
         id.setLanguage(language);
 
@@ -42,17 +49,18 @@ public class CountryLanguageController {
             countryLanguageRepository.delete(checkCountryLanguage.get());
 
             return "Country language deleted";
+
         } else {
 
-            return "Country language not found";
+            throw new LanguageNotFoundException(language);
 
         }
 
     }
 
     @PatchMapping("/language/updateLanguage")
-    public Optional<String> updateLanguage(@RequestParam(name = "code", required = true) String code, @RequestParam(name = "language", required = true) String language, @RequestBody Map<String, Object> updates) {
-        CountryLanguageIdDTO id = new CountryLanguageIdDTO();
+    public Optional<String> updateLanguage(@RequestParam(name = "code", required = true) String code, @RequestParam(name = "language", required = true) String language, @RequestBody Map<String, Object> updates) throws LanguageNotFoundException {
+        CountrylanguageIdDTO id = new CountrylanguageIdDTO();
         id.setCountryCode(code);
         id.setLanguage(language);
 
@@ -81,15 +89,15 @@ public class CountryLanguageController {
                     });
         }
 
-        return Optional.empty();
+        else {throw new LanguageNotFoundException(language);}
     }
 
 
 
 
     @GetMapping("/language/getByCode")
-    public Optional<CountryLanguageDTO> getByCode(@RequestParam(name= "code", required = true) String code, @RequestParam(name = "language", required = true) String language) {
-        CountryLanguageIdDTO id = new CountryLanguageIdDTO();
+    public Optional<CountrylanguageDTO> getByCode(@RequestParam(name= "code", required = true) String code, @RequestParam(name = "language", required = true) String language) throws LanguageNotFoundException {
+        CountrylanguageIdDTO id = new CountrylanguageIdDTO();
         id.setCountryCode(code);
         id.setLanguage(language);
 
@@ -101,7 +109,7 @@ public class CountryLanguageController {
             return checkCountryLanguage;
         } else {
 
-            return Optional.empty();
+            throw new LanguageNotFoundException(language);
 
         }
     }

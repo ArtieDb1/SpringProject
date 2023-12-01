@@ -1,5 +1,7 @@
 package com.sparta.springtasticsix.springproject.controllers;
 
+import com.sparta.springtasticsix.springproject.exceptions.countrynotfoundprotocol.CountryNotFoundException;
+import com.sparta.springtasticsix.springproject.exceptions.duplicatecountryprotocol.DuplicateCountryException;
 import com.sparta.springtasticsix.springproject.model.entities.CityDTO;
 import com.sparta.springtasticsix.springproject.model.entities.CountryDTO;
 import com.sparta.springtasticsix.springproject.model.repositories.CityRepository;
@@ -26,23 +28,26 @@ public class CountryController {
     }
 
     @PostMapping("/country/createCountry")
-    public CountryDTO createCountry(@RequestBody CountryDTO newCountry) {
+    public CountryDTO createCountry(@RequestBody CountryDTO newCountry) throws DuplicateCountryException {
+        if (countryRepository.existsById(newCountry.getCode())) {
+            throw new DuplicateCountryException(newCountry.getCode());
+        }
         countryRepository.save(newCountry);
         return newCountry;
     }
 
     @GetMapping("/country/getByCode")
-    public Optional<CountryDTO> getByCode(@RequestParam(name= "code", required = true) String code) {
+    public Optional<CountryDTO> getByCode(@RequestParam(name= "code", required = true) String code) throws CountryNotFoundException {
         Optional<CountryDTO> checkCountry = countryRepository.findById(code);
         if(checkCountry.isPresent()) {
             return checkCountry;
         } else {
-            return Optional.empty();
+            throw new CountryNotFoundException(code);
         }
     }
 
     @PatchMapping("/country/updateCountry/{code}")
-    public CountryDTO updateCountry(@PathVariable String code, @RequestBody CountryDTO updateCountry) {
+    public CountryDTO updateCountry(@PathVariable String code, @RequestBody CountryDTO updateCountry) throws CountryNotFoundException {
         CountryDTO country = null;
         if(countryRepository.findById(code).isPresent()) {
             country = countryRepository.findById(code).get();
@@ -61,6 +66,8 @@ public class CountryController {
             country.setHeadOfState((updateCountry.getHeadOfState()));
             country.setCapital((updateCountry.getCapital()));
             country.setCode2((updateCountry.getCode2()));
+        }else{
+            throw new CountryNotFoundException(code);
         }
         return countryRepository.save(country);
     }
@@ -68,24 +75,24 @@ public class CountryController {
 
 
     @DeleteMapping("/country/deleteCountry/{code}")
-    public String deleteCountry(@PathVariable String code) {
+    public String deleteCountry(@PathVariable String code) throws CountryNotFoundException {
         Optional<CountryDTO> checkCountry = countryRepository.findById(code);
         if(checkCountry.isPresent()) {
             countryRepository.delete(checkCountry.get());
             return "Deleted: " + checkCountry.get();
         } else {
-            return "Country not found";
+            throw new CountryNotFoundException(code);
         }
     }
 
-    @GetMapping("/country/getCountriesWithNoHos")
-    public List<CountryDTO> getCountriesWithNoHos() {
+    @GetMapping("/country/getCountriesWithNoHeadOfState")
+    public List<CountryDTO> getCountriesWithNoHeadOfState() {
         List<CountryDTO> countries = countryRepository.findCountriesWithNullOrBlankHeadOfState();
         return countries;
     }
 
     @GetMapping("/country/getPercentageOfPopulation/{code}")
-    public Double getPercentageOfPopulation(@PathVariable String code) {
+    public Double getPercentageOfPopulation(@PathVariable String code) throws CountryNotFoundException {
         Optional<CountryDTO> country = countryRepository.findById(code);
         if(country.isPresent()) {
             List<CityDTO> cities = cityRepository.findCityDTOByCountryCode(country.get());
@@ -98,10 +105,11 @@ public class CountryController {
             Integer countryPOP = country.get().getPopulation();
             return ((double) largestPOP / countryPOP) * 100;
         } else {
-            //Need to handle errors here for no country found
-            return 999d;
+            throw new CountryNotFoundException(code);
         }
+
     }
+
 
     @GetMapping("/country/getMostCities")
     public String getMostCities() {
