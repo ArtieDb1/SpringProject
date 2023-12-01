@@ -67,28 +67,16 @@ public class CityController {
 
     @GetMapping("/city/perCountry")
     public Integer countCitiesPerCountry(@RequestParam (name = "code", required = true ) String code) {
-        CountryDTO country= countryRepository.findById(code);
-        List<CityDTO> targetCities = cityRepository.findByCountryCode(country);
+        Optional<CountryDTO> country= countryRepository.findById(code);
         Integer counter = 0;
-        for (City DTO city : targetCities) {
-            counter++;
+        if(country.isPresent()) {
+            List<CityDTO> targetCities = cityRepository.findByCountryCode(country.get());
+
+            for (CityDTO city : targetCities) {
+                counter++;
+            }
         }
-        return counter;
 
-
-
-
-
-
-
-        List<CityDTO> allCities = cityRepository.findAll();
-        Integer counter = 0;
-        for(CityDTO city : allCities){
-           if(city.getCountryCode().toString() == code)){
-               counter++;
-           }
-       }
         return counter;
     }
-
 }
