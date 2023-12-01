@@ -2,6 +2,7 @@ package com.sparta.springtasticsix.springproject.controllers;
 
 
 import com.sparta.springtasticsix.springproject.exceptions.citynotfoundprotocol.CityNotFoundException;
+import com.sparta.springtasticsix.springproject.exceptions.countrynotfoundprotocol.CountryNotFoundException;
 import com.sparta.springtasticsix.springproject.exceptions.duplicatecityprotocol.DuplicateCityException;
 import com.sparta.springtasticsix.springproject.exceptions.invalidcodeprotocol.InvalidCodeException;
 import com.sparta.springtasticsix.springproject.model.entities.CityDTO;
@@ -59,7 +60,7 @@ public class CityController {
             city.setCountryCode(updatedCity.getCountryCode());
             city.setDistrict(updatedCity.getDistrict());
         }
-        else{ throw new CityNotFoundException(updatedCity);}
+        else{ throw new CityNotFoundException(id);}
         return cityRepository.save(city);
     }
 
@@ -93,14 +94,31 @@ public class CityController {
     }
 
     @DeleteMapping("/city/deleteCity/{id}")
-    public String deleteCity(@PathVariable Integer id) {
+    public String deleteCity(@PathVariable Integer id) throws CityNotFoundException {
         Optional<CityDTO> checkCity = cityRepository.findById(id);
         if(checkCity.isPresent()) {
             cityRepository.delete(checkCity.get());
             return "Deleted: " + checkCity.get();
         } else {
-            return "City not found";
+            throw new CityNotFoundException(id);
         }
+    }
+
+    @GetMapping("/city/perCountry")
+    public Integer countCitiesPerCountry(@RequestParam (name = "code", required = true ) String code) throws CountryNotFoundException {
+        Optional<CountryDTO> country= countryRepository.findById(code);
+        Integer counter = 0;
+        if(country.isPresent()) {
+            List<CityDTO> targetCities = cityRepository.findByCountryCode(country.get());
+
+            for (CityDTO city : targetCities) {
+                counter++;
+            }
+        } else {
+            throw new CountryNotFoundException(code);
+        }
+
+        return counter;
     }
 
     private Map<String, Integer> sortMap(Map<String, Integer> map) {
@@ -114,18 +132,4 @@ public class CityController {
         return newMap;
     }
 
-    @GetMapping("/city/perCountry")
-    public Integer countCitiesPerCountry(@RequestParam (name = "code", required = true ) String code) {
-        Optional<CountryDTO> country= countryRepository.findById(code);
-        Integer counter = 0;
-        if(country.isPresent()) {
-            List<CityDTO> targetCities = cityRepository.findByCountryCode(country.get());
-
-            for (CityDTO city : targetCities) {
-                counter++;
-            }
-        }
-
-        return counter;
-    }
 }
