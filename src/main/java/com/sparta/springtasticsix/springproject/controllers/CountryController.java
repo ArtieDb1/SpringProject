@@ -1,10 +1,15 @@
 package com.sparta.springtasticsix.springproject.controllers;
 
+import com.sparta.springtasticsix.springproject.model.entities.CityDTO;
 import com.sparta.springtasticsix.springproject.model.entities.CountryDTO;
+import com.sparta.springtasticsix.springproject.model.repositories.CityRepository;
 import com.sparta.springtasticsix.springproject.model.repositories.CountryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+
+import java.math.BigDecimal;
+import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,10 +17,12 @@ import java.util.Optional;
 public class CountryController {
 
     private final CountryRepository countryRepository;
+    private final CityRepository cityRepository;
 
     @Autowired
-    public CountryController(CountryRepository countryRepository) {
+    public CountryController(CountryRepository countryRepository, CityRepository cityRepository) {
         this.countryRepository = countryRepository;
+        this.cityRepository = cityRepository;
     }
 
     @PostMapping("/country/createCountry")
@@ -58,12 +65,14 @@ public class CountryController {
         return countryRepository.save(country);
     }
 
+
+
     @DeleteMapping("/country/deleteCountry/{code}")
     public String deleteCountry(@PathVariable String code) {
         Optional<CountryDTO> checkCountry = countryRepository.findById(code);
         if(checkCountry.isPresent()) {
             countryRepository.delete(checkCountry.get());
-            return "Deleted: " + checkCountry.get().toString();
+            return "Deleted: " + checkCountry.get();
         } else {
             return "Country not found";
         }
@@ -73,5 +82,44 @@ public class CountryController {
     public List<CountryDTO> getCountriesWithNoHos() {
         List<CountryDTO> countries = countryRepository.findCountriesWithNullOrBlankHeadOfState();
         return countries;
+    }
+
+    @GetMapping("/country/getPercentageOfPopulation/{code}")
+    public Double getPercentageOfPopulation(@PathVariable String code) {
+        Optional<CountryDTO> country = countryRepository.findById(code);
+        if(country.isPresent()) {
+            List<CityDTO> cities = cityRepository.findCityDTOByCountryCode(country.get());
+            Integer largestPOP = cities.get(0).getPopulation();
+            for(CityDTO city: cities) {
+                if(city.getPopulation() > largestPOP) {
+                    largestPOP = city.getPopulation();
+                }
+            }
+            Integer countryPOP = country.get().getPopulation();
+            return ((double) largestPOP / countryPOP) * 100;
+        } else {
+            //Need to handle errors here for no country found
+            return 999d;
+        }
+    }
+
+    @GetMapping("/country/getMostCities")
+    public String getMostCities() {
+        List<CityDTO> cities = cityRepository.findByOrderByCountryCode();
+        int largestCount = 0;
+        int currentCount = 1;
+        CountryDTO largestCode = cities.get(0).getCountryCode();
+        for(int i = 0; i < cities.size(); i++) {
+            if(i+1 < cities.size() && cities.get(i+1).getCountryCode().equals(cities.get(i).getCountryCode())) {
+                currentCount++;
+            } else {
+                if(currentCount > largestCount) {
+                    largestCount = currentCount;
+                    largestCode = cities.get(i).getCountryCode();
+                }
+                currentCount = 1;
+            }
+        }
+        return "Country: " + largestCode.getName() + " has " + largestCount + " cities";
     }
 }
