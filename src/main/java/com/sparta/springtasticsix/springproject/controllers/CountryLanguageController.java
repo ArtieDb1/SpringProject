@@ -1,5 +1,6 @@
 package com.sparta.springtasticsix.springproject.controllers;
 
+import com.sparta.springtasticsix.springproject.exceptions.duplicatelanguageprotocol.DuplicateLanguageException;
 import com.sparta.springtasticsix.springproject.model.entities.CountryDTO;
 import com.sparta.springtasticsix.springproject.model.entities.CountrylanguageDTO;
 import com.sparta.springtasticsix.springproject.model.entities.CountrylanguageIdDTO;
@@ -8,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -24,7 +24,11 @@ public class CountryLanguageController {
     }
 
     @PostMapping("/language/createLanguage")
-    public CountrylanguageDTO createLanguage(@RequestBody CountrylanguageDTO newLanguage) {
+    public CountrylanguageDTO createLanguage(@RequestBody CountrylanguageDTO newLanguage) throws DuplicateLanguageException {
+        if (countryLanguageRepository.existsById(newLanguage.getId())){
+            throw new DuplicateLanguageException(newLanguage);
+        }
+
         countryLanguageRepository.save(newLanguage);
         return newLanguage;
     }
