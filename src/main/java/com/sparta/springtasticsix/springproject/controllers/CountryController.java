@@ -1,5 +1,6 @@
 package com.sparta.springtasticsix.springproject.controllers;
 
+import com.sparta.springtasticsix.springproject.exceptions.duplicatecountryprotocol.DuplicateCountryException;
 import com.sparta.springtasticsix.springproject.model.entities.CityDTO;
 import com.sparta.springtasticsix.springproject.model.entities.CountryDTO;
 import com.sparta.springtasticsix.springproject.model.repositories.CityRepository;
@@ -26,7 +27,10 @@ public class CountryController {
     }
 
     @PostMapping("/country/createCountry")
-    public CountryDTO createCountry(@RequestBody CountryDTO newCountry) {
+    public CountryDTO createCountry(@RequestBody CountryDTO newCountry) throws DuplicateCountryException {
+        if (countryRepository.existsById(newCountry.getCode())) {
+            throw new DuplicateCountryException(newCountry.getCode());
+        }
         countryRepository.save(newCountry);
         return newCountry;
     }
