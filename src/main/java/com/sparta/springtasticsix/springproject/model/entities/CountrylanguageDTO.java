@@ -12,7 +12,7 @@ public class CountrylanguageDTO {
     private CountrylanguageIdDTO id;
 
     @MapsId("countryCode")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "CountryCode", nullable = false)
     private CountryDTO countryCode;
 
