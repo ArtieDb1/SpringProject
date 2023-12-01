@@ -72,7 +72,7 @@ public class CountryController {
         Optional<CountryDTO> checkCountry = countryRepository.findById(code);
         if(checkCountry.isPresent()) {
             countryRepository.delete(checkCountry.get());
-            return "Deleted: " + checkCountry.get().toString();
+            return "Deleted: " + checkCountry.get();
         } else {
             return "Country not found";
         }
@@ -101,5 +101,25 @@ public class CountryController {
             //Need to handle errors here for no country found
             return 999d;
         }
+    }
+
+    @GetMapping("/country/getMostCities")
+    public String getMostCities() {
+        List<CityDTO> cities = cityRepository.findByOrderByCountryCode();
+        int largestCount = 0;
+        int currentCount = 1;
+        CountryDTO largestCode = cities.get(0).getCountryCode();
+        for(int i = 0; i < cities.size(); i++) {
+            if(i+1 < cities.size() && cities.get(i+1).getCountryCode().equals(cities.get(i).getCountryCode())) {
+                currentCount++;
+            } else {
+                if(currentCount > largestCount) {
+                    largestCount = currentCount;
+                    largestCode = cities.get(i).getCountryCode();
+                }
+                currentCount = 1;
+            }
+        }
+        return "Country: " + largestCode.getName() + " has " + largestCount + " cities";
     }
 }
