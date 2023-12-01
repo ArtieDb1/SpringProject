@@ -1,7 +1,11 @@
 package com.sparta.springtasticsix.springproject.controllers;
 
 
+import com.sparta.springtasticsix.springproject.exceptions.citynotfoundprotocol.CityNotFoundException;
+import com.sparta.springtasticsix.springproject.exceptions.duplicatecityprotocol.DuplicateCityException;
+import com.sparta.springtasticsix.springproject.exceptions.invalidcodeprotocol.InvalidCodeException;
 import com.sparta.springtasticsix.springproject.model.entities.CityDTO;
+import com.sparta.springtasticsix.springproject.model.entities.CountryDTO;
 import com.sparta.springtasticsix.springproject.model.repositories.CityRepository;
 import com.sparta.springtasticsix.springproject.model.repositories.CountryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,23 +30,27 @@ public class CityController {
     }
 
     @PostMapping("/city/createCity")
-    public CityDTO createCity(@RequestBody CityDTO newCity) {
+    public CityDTO createCity(@RequestBody CityDTO newCity) throws DuplicateCityException {
+        if (cityRepository.existsById(newCity.getId())){
+            throw new DuplicateCityException(newCity);
+        }
         cityRepository.save(newCity);
         return newCity;
     }
 
     @GetMapping("/city/getById/{id}")
-    public Optional<CityDTO> getByCode(@PathVariable Integer id) {
+    public Optional<CityDTO> getByCode(@PathVariable Integer id) throws InvalidCodeException {
         Optional<CityDTO> checkCity = cityRepository.findById(id);
         if(checkCity.isPresent()) {
             return checkCity;
         } else {
-            return Optional.empty();
+//            return Optional.empty();
+            throw new InvalidCodeException(id);
         }
     }
 
     @PatchMapping("/city/updateCity/{id}")
-    public CityDTO updateCountry(@PathVariable Integer id, @RequestBody CityDTO updatedCity) {
+    public CityDTO updateCity(@PathVariable Integer id, @RequestBody CityDTO updatedCity) throws CityNotFoundException{
         CityDTO city = null;
         if(cityRepository.findById(id).isPresent()) {
             city = cityRepository.findById(id).get();
@@ -51,6 +59,7 @@ public class CityController {
             city.setCountryCode(updatedCity.getCountryCode());
             city.setDistrict(updatedCity.getDistrict());
         }
+        else{ throw new CityNotFoundException(updatedCity);}
         return cityRepository.save(city);
     }
 
