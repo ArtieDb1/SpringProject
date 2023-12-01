@@ -4,19 +4,25 @@ package com.sparta.springtasticsix.springproject.controllers;
 import com.sparta.springtasticsix.springproject.model.entities.CityDTO;
 import com.sparta.springtasticsix.springproject.model.entities.CountryDTO;
 import com.sparta.springtasticsix.springproject.model.repositories.CityRepository;
+import com.sparta.springtasticsix.springproject.model.repositories.CountryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
 public class CityController {
 
     private final CityRepository cityRepository;
+    private final CountryRepository countryRepository;
 
     @Autowired
-    public CityController(CityRepository cityRepository) {
+    public CityController(CityRepository cityRepository,
+                          CountryRepository countryRepository) {
         this.cityRepository = cityRepository;
+        this.countryRepository = countryRepository;
     }
 
     @PostMapping("/city/createCity")
@@ -59,4 +65,18 @@ public class CityController {
         }
     }
 
+    @GetMapping("/city/perCountry")
+    public Integer countCitiesPerCountry(@RequestParam (name = "code", required = true ) String code) {
+        Optional<CountryDTO> country= countryRepository.findById(code);
+        Integer counter = 0;
+        if(country.isPresent()) {
+            List<CityDTO> targetCities = cityRepository.findByCountryCode(country.get());
+
+            for (CityDTO city : targetCities) {
+                counter++;
+            }
+        }
+
+        return counter;
+    }
 }
