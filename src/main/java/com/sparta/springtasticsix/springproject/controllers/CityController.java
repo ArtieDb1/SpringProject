@@ -7,7 +7,7 @@ import com.sparta.springtasticsix.springproject.model.repositories.CityRepositor
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 public class CityController {
@@ -46,6 +46,29 @@ public class CityController {
             city.setDistrict(updatedCity.getDistrict());
         }
         return cityRepository.save(city);
+    }
+
+    @GetMapping("/city/get5LeastPopulatedDistricts")
+    public void get5LeastPopulatedDistricts(){
+        List<CityDTO> allCities = cityRepository.findAll();
+        Map<String, Integer> districtPopulationMap = new HashMap<>();
+        districtPopulationMap.put(allCities.get(0).getDistrict(), allCities.get(0).getPopulation());
+
+//      for(int i = 1; i < allCities.size(); i++){
+        for(int i = 1; i < 12; i++){
+            if(!(allCities.get(i).getDistrict().isEmpty() || allCities.get(i).getDistrict() == "-")){
+
+                    if (districtPopulationMap.containsKey(allCities.get(i).getDistrict())){
+                        //add population of current city to the districtPopulationMap.value
+                        districtPopulationMap.put(allCities.get(i).getDistrict(), districtPopulationMap.get(allCities.get(i).getDistrict()) + allCities.get(i).getPopulation());
+                    }
+                    else{
+                        districtPopulationMap.put(allCities.get(i).getDistrict(), allCities.get(i).getPopulation());
+                    }
+            }
+        }
+        //at this point we have total population of ALL districts
+        Collections.s
     }
 
     @DeleteMapping("/city/deleteCity/{id}")
