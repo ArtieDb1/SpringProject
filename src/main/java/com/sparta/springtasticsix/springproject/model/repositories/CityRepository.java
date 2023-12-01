@@ -11,7 +11,6 @@ import java.util.List;
 @Repository
 public interface CityRepository extends JpaRepository<CityDTO, Integer> {
     List<CityDTO> findCityDTOByCountryCode(CountryDTO country);
-
+    List<CityDTO> findByCountryCode(CountryDTO country);
     List<CityDTO> findByOrderByCountryCode();
-
 }
