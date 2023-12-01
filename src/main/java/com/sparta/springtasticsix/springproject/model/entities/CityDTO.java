@@ -18,7 +18,7 @@ public class CityDTO {
     private String name;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER  , optional = false)
     @JoinColumn(name = "CountryCode", nullable = false)
     private CountryDTO countryCode;
 
