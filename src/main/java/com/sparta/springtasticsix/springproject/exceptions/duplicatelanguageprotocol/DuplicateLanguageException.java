@@ -4,6 +4,6 @@ import com.sparta.springtasticsix.springproject.model.entities.CountrylanguageDT
 
 public class DuplicateLanguageException extends Exception {
     public DuplicateLanguageException(CountrylanguageDTO newLanguage) {
-        super(newLanguage +" already exists in database");
+        super(newLanguage.getId().getLanguage() +" already exists in database.");
     }
 }
