@@ -5,6 +5,7 @@ import com.sparta.springtasticsix.springproject.exceptions.languagenotfoundproto
 import com.sparta.springtasticsix.springproject.model.entities.CountryDTO;
 import com.sparta.springtasticsix.springproject.model.entities.CountryLanguageDTO;
 import com.sparta.springtasticsix.springproject.model.entities.CountryLanguageIdDTO;
+import com.sparta.springtasticsix.springproject.model.entities.CountryLanguageDTO;
 import com.sparta.springtasticsix.springproject.model.repositories.CountryRepository;
 import com.sparta.springtasticsix.springproject.model.repositories.CountryLanguageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class CountryLanguageController {
     }
 
     @PostMapping("/language/createLanguage")
-    public CountrylanguageDTO createLanguage(@RequestBody CountrylanguageDTO newLanguage) throws DuplicateLanguageException {
+    public CountryLanguageDTO createLanguage(@RequestBody CountryLanguageDTO newLanguage) throws DuplicateLanguageException {
         if (countryLanguageRepository.existsById(newLanguage.getId())){
             throw new DuplicateLanguageException(newLanguage);
         }
@@ -39,7 +40,7 @@ public class CountryLanguageController {
 
     @DeleteMapping("/language/deleteLanguage")
     public String deleteLanguage (@RequestParam(name = "code", required = true) String code, @RequestParam(name = "language", required = true) String language) throws LanguageNotFoundException {
-        CountrylanguageIdDTO id = new CountrylanguageIdDTO();
+        CountryLanguageIdDTO id = new CountryLanguageIdDTO();
         id.setCountryCode(code);
         id.setLanguage(language);
 
@@ -60,7 +61,7 @@ public class CountryLanguageController {
 
     @PatchMapping("/language/updateLanguage")
     public Optional<String> updateLanguage(@RequestParam(name = "code", required = true) String code, @RequestParam(name = "language", required = true) String language, @RequestBody Map<String, Object> updates) throws LanguageNotFoundException {
-        CountrylanguageIdDTO id = new CountrylanguageIdDTO();
+        CountryLanguageIdDTO id = new CountryLanguageIdDTO();
         id.setCountryCode(code);
         id.setLanguage(language);
 
@@ -96,8 +97,8 @@ public class CountryLanguageController {
 
 
     @GetMapping("/language/getByCode")
-    public Optional<CountrylanguageDTO> getByCode(@RequestParam(name= "code", required = true) String code, @RequestParam(name = "language", required = true) String language) throws LanguageNotFoundException {
-        CountrylanguageIdDTO id = new CountrylanguageIdDTO();
+    public Optional<CountryLanguageDTO> getByCode(@RequestParam(name= "code", required = true) String code, @RequestParam(name = "language", required = true) String language) throws LanguageNotFoundException {
+        CountryLanguageIdDTO id = new CountryLanguageIdDTO();
         id.setCountryCode(code);
         id.setLanguage(language);
 
