@@ -3,7 +3,9 @@ package com.sparta.springtasticsix.springproject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.springtasticsix.springproject.controllers.CountryController;
 import com.sparta.springtasticsix.springproject.model.entities.CountryDTO;
+import com.sparta.springtasticsix.springproject.model.repositories.CityRepository;
 import com.sparta.springtasticsix.springproject.model.repositories.CountryRepository;
+//import com.sparta.springtasticsix.springproject.security.AuthenticationService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -35,6 +37,9 @@ public class MockCountryTests {
 
     @MockBean
     private CountryRepository countryRepository;
+
+    @MockBean
+    private CityRepository cityRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -77,7 +82,7 @@ public class MockCountryTests {
         Mockito.when(countryRepository.findById(mockCountry.getCode())).thenReturn(Optional.of(mockCountry));
 
         mockMvc
-                .perform(patch("http://localhost:8080//country/updateCountry/AGO")
+                .perform(patch("http://localhost:8080/country/updateCountry/AGO")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(mockCountry)))
                 .andExpect(status().is(200))
