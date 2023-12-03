@@ -25,12 +25,12 @@ public class CountryController {
     }
 
     @PostMapping("/country/createCountry")
-    public CountryDTO createCountry(@RequestBody CountryDTO newCountry) throws DuplicateCountryException {
+    public Optional<CountryDTO> createCountry(@RequestBody CountryDTO newCountry) throws DuplicateCountryException {
         if (countryRepository.existsById(newCountry.getCode())) {
             throw new DuplicateCountryException(newCountry.getCode());
         }
         countryRepository.save(newCountry);
-        return newCountry;
+        return Optional.of(newCountry);
     }
 
     @GetMapping("/country/getByCode")
@@ -44,7 +44,7 @@ public class CountryController {
     }
 
     @PatchMapping("/country/updateCountry/{code}")
-    public CountryDTO updateCountry(@PathVariable String code, @RequestBody CountryDTO updateCountry) throws CountryNotFoundException {
+    public Optional<CountryDTO> updateCountry(@PathVariable String code, @RequestBody CountryDTO updateCountry) throws CountryNotFoundException {
         CountryDTO country = null;
         if(countryRepository.findById(code).isPresent()) {
             country = countryRepository.findById(code).get();
@@ -66,7 +66,8 @@ public class CountryController {
         }else{
             throw new CountryNotFoundException(code);
         }
-        return countryRepository.save(country);
+        countryRepository.save(country);
+        return Optional.of(country);
     }
 
 

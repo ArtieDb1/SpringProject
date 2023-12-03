@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CountryController.class)
-@AutoConfigureMockMvc
+//@AutoConfigureMockMvc
 public class MockCountryTests {
 
     @Autowired
@@ -82,6 +82,7 @@ public class MockCountryTests {
         Mockito.when(countryRepository.findById(mockCountry.getCode())).thenReturn(Optional.of(mockCountry));
 
         mockMvc
+
                 .perform(patch("http://localhost:8080/country/updateCountry/AGO")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(mockCountry)))
@@ -90,4 +91,61 @@ public class MockCountryTests {
                 .andDo(print());
     }
 
+    @Test
+    @DisplayName("Check get country by code given AGO returns Angola")
+    void checkGetCountryByCodeGivenAGOReturnsAngola() throws Exception {
+        CountryDTO mockCountry = new CountryDTO();
+        mockCountry.setCode("AGO");
+        mockCountry.setName("Angola");
+        mockCountry.setContinent("Africa");
+        mockCountry.setRegion("Central Africa");
+        mockCountry.setSurfaceArea(BigDecimal.valueOf(1246700));
+        mockCountry.setIndepYear((short) 1975);
+        mockCountry.setPopulation(12878000);
+        mockCountry.setLifeExpectancy(BigDecimal.valueOf(38.3));
+        mockCountry.setGnp(BigDecimal.valueOf(6648.00));
+        mockCountry.setGNPOld(BigDecimal.valueOf(7984.00));
+        mockCountry.setLocalName("Angola");
+        mockCountry.setGovernmentForm("Republic");
+        mockCountry.setHeadOfState("José Eduardo dos Santos");
+        mockCountry.setCapital(56);
+        mockCountry.setCode2("AO");
+
+        Mockito.when(countryRepository.findById(mockCountry.getCode())).thenReturn(Optional.of(mockCountry));
+
+        mockMvc
+                .perform(get("http://localhost:8080/country/getByCode?code=AGO"))
+                .andExpect(status().is(200))
+                .andExpect(content().contentType("application/json"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("Check delete country given AGO returns deleted Angola")
+    void checkDeleteCountryGivenAGOReturnsDeletedAngola() throws Exception {
+        CountryDTO mockCountry = new CountryDTO();
+        mockCountry.setCode("AGO");
+        mockCountry.setName("Angola");
+        mockCountry.setContinent("Africa");
+        mockCountry.setRegion("Central Africa");
+        mockCountry.setSurfaceArea(BigDecimal.valueOf(1246700));
+        mockCountry.setIndepYear((short) 1975);
+        mockCountry.setPopulation(12878000);
+        mockCountry.setLifeExpectancy(BigDecimal.valueOf(38.3));
+        mockCountry.setGnp(BigDecimal.valueOf(6648.00));
+        mockCountry.setGNPOld(BigDecimal.valueOf(7984.00));
+        mockCountry.setLocalName("Angola");
+        mockCountry.setGovernmentForm("Republic");
+        mockCountry.setHeadOfState("José Eduardo dos Santos");
+        mockCountry.setCapital(56);
+        mockCountry.setCode2("AO");
+
+        Mockito.when(countryRepository.findById(mockCountry.getCode())).thenReturn(Optional.of(mockCountry));
+
+        mockMvc
+                .perform(delete("http://localhost:8080/country/deleteCountry/AGO"))
+                .andExpect(status().is(200))
+                .andExpect(content().contentType("text/plain;charset=UTF-8"))
+                .andDo(print());
+    }
 }
