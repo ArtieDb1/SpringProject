@@ -4,7 +4,6 @@ package com.sparta.springtasticsix.springproject.controllers;
 import com.sparta.springtasticsix.springproject.exceptions.citynotfoundprotocol.CityNotFoundException;
 import com.sparta.springtasticsix.springproject.exceptions.countrynotfoundprotocol.CountryNotFoundException;
 import com.sparta.springtasticsix.springproject.exceptions.duplicatecityprotocol.DuplicateCityException;
-import com.sparta.springtasticsix.springproject.exceptions.invalidcodeprotocol.InvalidCodeException;
 import com.sparta.springtasticsix.springproject.model.entities.CityDTO;
 import com.sparta.springtasticsix.springproject.model.entities.CountryDTO;
 import com.sparta.springtasticsix.springproject.model.repositories.CityRepository;
@@ -40,13 +39,12 @@ public class CityController {
     }
 
     @GetMapping("/city/getById/{id}")
-    public Optional<CityDTO> getByCode(@PathVariable Integer id) throws InvalidCodeException {
+    public Optional<CityDTO> getByCode(@PathVariable Integer id) throws CityNotFoundException {
         Optional<CityDTO> checkCity = cityRepository.findById(id);
         if(checkCity.isPresent()) {
             return checkCity;
         } else {
-//            return Optional.empty();
-            throw new InvalidCodeException(id);
+            throw new CityNotFoundException(id);
         }
     }
 
