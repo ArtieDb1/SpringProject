@@ -8,6 +8,7 @@ import com.sparta.springtasticsix.springproject.model.entities.CityDTO;
 import com.sparta.springtasticsix.springproject.model.entities.CountryDTO;
 import com.sparta.springtasticsix.springproject.model.repositories.CityRepository;
 import com.sparta.springtasticsix.springproject.model.repositories.CountryRepository;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +29,7 @@ public class CityController {
         this.cityRepository = cityRepository;
         this.countryRepository = countryRepository;
     }
-
+    @Operation(summary = "Create a city by supplyng a body in JSON format")
     @PostMapping("/city/createCity")
     public CityDTO createCity(@RequestBody CityDTO newCity) throws DuplicateCityException {
         if (cityRepository.existsById(newCity.getId())){
@@ -37,7 +38,7 @@ public class CityController {
         cityRepository.save(newCity);
         return newCity;
     }
-
+    @Operation(summary = "Get a city by its city ID")
     @GetMapping("/city/getById/{id}")
     public Optional<CityDTO> getByCode(@PathVariable Integer id) throws CityNotFoundException {
         Optional<CityDTO> checkCity = cityRepository.findById(id);
@@ -47,7 +48,7 @@ public class CityController {
             throw new CityNotFoundException(id);
         }
     }
-
+    @Operation(summary = "Update a city by its city ID")
     @PatchMapping("/city/updateCity/{id}")
     public CityDTO updateCity(@PathVariable Integer id, @RequestBody CityDTO updatedCity) throws CityNotFoundException{
         CityDTO city = null;
@@ -61,7 +62,7 @@ public class CityController {
         else{ throw new CityNotFoundException(id);}
         return cityRepository.save(city);
     }
-
+    @Operation(summary = "Get the five least populated districts in the world")
     @GetMapping("/city/get5LeastPopulatedDistricts")
     public Map<String, Integer> get5LeastPopulatedDistricts(){
         List<CityDTO> allCities = cityRepository.findAll();
@@ -90,7 +91,7 @@ public class CityController {
         }
         return sortMap(districtsWithLowestPopulation);
     }
-
+    @Operation(summary = "Delete a city by its country code")
     @DeleteMapping("/city/deleteCity/{id}")
     public String deleteCity(@PathVariable Integer id) throws CityNotFoundException {
         Optional<CityDTO> checkCity = cityRepository.findById(id);
@@ -101,7 +102,7 @@ public class CityController {
             throw new CityNotFoundException(id);
         }
     }
-
+    @Operation(summary = "Count how many cities in a country by supplying country code")
     @GetMapping("/city/perCountry")
     public Integer countCitiesPerCountry(@RequestParam (name = "code", required = true ) String code) throws CountryNotFoundException {
         Optional<CountryDTO> country= countryRepository.findById(code);
