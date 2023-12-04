@@ -6,6 +6,7 @@ import com.sparta.springtasticsix.springproject.model.entities.CityDTO;
 import com.sparta.springtasticsix.springproject.model.entities.CountryDTO;
 import com.sparta.springtasticsix.springproject.model.repositories.CityRepository;
 import com.sparta.springtasticsix.springproject.model.repositories.CountryRepository;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +24,7 @@ public class CountryController {
         this.countryRepository = countryRepository;
         this.cityRepository = cityRepository;
     }
-
+    @Operation(summary = "Create a country by supplying it a body in JSON format")
     @PostMapping("/country/createCountry")
     public Optional<CountryDTO> createCountry(@RequestBody CountryDTO newCountry) throws DuplicateCountryException {
         if (countryRepository.existsById(newCountry.getCode())) {
@@ -33,6 +34,7 @@ public class CountryController {
         return Optional.of(newCountry);
     }
 
+    @Operation(summary = "Get a country by its country code")
     @GetMapping("/country/getByCode")
     public Optional<CountryDTO> getByCode(@RequestParam(name= "code", required = true) String code) throws CountryNotFoundException {
         Optional<CountryDTO> checkCountry = countryRepository.findById(code);
@@ -42,7 +44,7 @@ public class CountryController {
             throw new CountryNotFoundException(code);
         }
     }
-
+    @Operation(summary = "Update a country by its country code, supply body in JSON format")
     @PatchMapping("/country/updateCountry/{code}")
     public Optional<CountryDTO> updateCountry(@PathVariable String code, @RequestBody CountryDTO updateCountry) throws CountryNotFoundException {
         CountryDTO country = null;
@@ -71,7 +73,7 @@ public class CountryController {
     }
 
 
-
+    @Operation(summary = "Delete a country by its country code")
     @DeleteMapping("/country/deleteCountry/{code}")
     public String deleteCountry(@PathVariable String code) throws CountryNotFoundException {
         Optional<CountryDTO> checkCountry = countryRepository.findById(code);
@@ -82,13 +84,13 @@ public class CountryController {
             throw new CountryNotFoundException(code);
         }
     }
-
+    @Operation(summary = "Get all countries with no Head of State")
     @GetMapping("/country/getCountriesWithNoHeadOfState")
     public List<CountryDTO> getCountriesWithNoHeadOfState() {
         List<CountryDTO> countries = countryRepository.findCountriesWithNullOrBlankHeadOfState();
         return countries;
     }
-
+    @Operation(summary = "Get percentage of population of a country by its country code")
     @GetMapping("/country/getPercentageOfPopulation/{code}")
     public Double getPercentageOfPopulation(@PathVariable String code) throws CountryNotFoundException {
         Optional<CountryDTO> country = countryRepository.findById(code);
@@ -108,7 +110,7 @@ public class CountryController {
 
     }
 
-
+    @Operation(summary = "Get the country with the most cities in the database")
     @GetMapping("/country/getMostCities")
     public String getMostCities() {
         List<CityDTO> cities = cityRepository.findByOrderByCountryCode();

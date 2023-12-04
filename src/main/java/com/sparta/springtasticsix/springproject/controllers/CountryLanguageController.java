@@ -8,6 +8,7 @@ import com.sparta.springtasticsix.springproject.model.entities.CountryLanguageId
 import com.sparta.springtasticsix.springproject.model.entities.CountryLanguageDTO;
 import com.sparta.springtasticsix.springproject.model.repositories.CountryRepository;
 import com.sparta.springtasticsix.springproject.model.repositories.CountryLanguageRepository;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +29,7 @@ public class CountryLanguageController {
         this.countryLanguageRepository = countryLanguageRepository;
         this.countryRepository = countryRepository;
     }
-
+    @Operation(summary = "Create a language by supplying a body in JSON format")
     @PostMapping("/language/createLanguage")
     public CountryLanguageDTO createLanguage(@RequestBody CountryLanguageDTO newLanguage) throws DuplicateLanguageException {
         if (countryLanguageRepository.existsById(newLanguage.getId())){
@@ -37,7 +38,7 @@ public class CountryLanguageController {
         countryLanguageRepository.save(newLanguage);
         return newLanguage;
     }
-
+    @Operation(summary = "Delete a language by its ID")
     @DeleteMapping("/language/deleteLanguage")
     public String deleteLanguage (@RequestParam(name = "code", required = true) String code, @RequestParam(name = "language", required = true) String language) throws LanguageNotFoundException {
         CountryLanguageIdDTO id = new CountryLanguageIdDTO();
@@ -58,7 +59,7 @@ public class CountryLanguageController {
         }
 
     }
-
+    @Operation(summary = "Update a language by supplying ID and language")
     @PatchMapping("/language/updateLanguage")
     public Optional<String> updateLanguage(@RequestParam(name = "code", required = true) String code, @RequestParam(name = "language", required = true) String language, @RequestBody Map<String, Object> updates) throws LanguageNotFoundException {
         CountryLanguageIdDTO id = new CountryLanguageIdDTO();
@@ -95,7 +96,7 @@ public class CountryLanguageController {
 
 
 
-
+    @Operation(summary = "Get a language by its ID")
     @GetMapping("/language/getByCode")
     public Optional<CountryLanguageDTO> getByCode(@RequestParam(name= "code", required = true) String code, @RequestParam(name = "language", required = true) String language) throws LanguageNotFoundException {
         CountryLanguageIdDTO id = new CountryLanguageIdDTO();
@@ -115,11 +116,7 @@ public class CountryLanguageController {
         }
     }
 
-    //get official language of country - if official is true
-    //if more than one official language, then keep the highest
-    //get the percentage of population that use this language
-    //get the total population of that country
-    //multiply the percentage for the total population
+    @Operation(summary = "Get the most popular official language of a country and how many people speak it by supplying the country code")
     @GetMapping("/language/getPopulation")
     public HashMap<String, Integer> getPopulationOfOfficialLanguage(@RequestParam(name = "code", required = true)String code) {
         //exception in case there's no official language
